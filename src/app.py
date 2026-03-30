@@ -1,4 +1,4 @@
-from inventory import add_product,show_product,calculate_statistics
+from services import add_product,show_product,calculate_statistics,search_product,update_product,delete_product
 
 inventory = []
 
@@ -10,7 +10,7 @@ def choice():
     while option > 0 and option < 10:
         try:
             option = int(input("""\nEnter what you want to do:
-1. Add product
+1. Add product 
 2. Show product
 3. Search product
 4. Update product
@@ -22,26 +22,27 @@ def choice():
 ..."""))
 
             if option == 1:
-                add_product(inventory)
+                add_product(inventory) #lsito
             elif option ==2:
-                show_product(inventory)
+                show_product(inventory) #lsito
             elif option == 3:
-                pass
+                search_product(inventory) #LISTO
             elif option == 4:
-                pass
+                update_product(inventory) #listo
             elif option == 5:
-                pass
+                delete_product(inventory)#LISTO
             elif option == 6:
-                calculate_statistics(inventory)
+                calculate_statistics(inventory) #LISTOOO
             elif option == 7:
                 pass
             elif option == 8:
                 pass
             elif option == 9:
-                pass
+                print('\nThanks for used our services')
             else:
                 print(f"\n{'-' * 10} Invalid input {'-' * 10}")
                 choice()
+        #por si se me pasa un error de value en las funciones
         except ValueError:
             print(f"\n{'-' * 10} Invalid input {'-' * 10}")
             choice()

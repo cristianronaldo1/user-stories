@@ -23,13 +23,13 @@ def options_(end,start):
                 retry = int(input(f'\nEnter your option...\n1.Name!\n2.Price!\n3.Quantity \n4.None'))
                 #Para que se repita cuando ingresa un numero diferente de 1 o 2
                 if retry != 1 and retry != 2 and retry != 3 and retry != 4:
-                    thr_option()
+                    return thr_option()
                 #Si ingresa alguno de los 3 numero retorna el valor
                 return retry 
             #Si pone texto tiene que volver a ingresar alguna de las dos opciones
             except ValueError:
                 print('\nInvalid input')
-                thr_option()
+                return thr_option()
         return thr_option()
 
 
@@ -40,11 +40,9 @@ def get_product_data():
     while retry != 2:
         try:
             #Ingreso de datos
-            print('\nNote: Do not use spaces or accents unless necessary.') #como hay productos que puede que tengan espacios en la mitad por eso pongo esto y no un punto replace(" ","")
-            name = input('Enter the product name: ').strip().lower() #Quitar los espacios de los extremos y poner en minuscula todo 
             price = float(input('Enter the price: '))
             quantity = int(input('Enter the quantity: '))
-            return name, price, quantity
+            return price, quantity
         except ValueError: #si pasa esto es porque puso un texto al momento de ingresar un numero
             retry = options_(2,1) #Devuelve el numero de la opcion escogida, en una función aparte se ve más cool
             if retry == 2:
@@ -53,19 +51,27 @@ def get_product_data():
 
 
 def add_product(inventory): #1 ---
-
-    result = get_product_data()
-    #Si no es none es porque si guardo algo
-    if result is not None:
-        name, price, quantity = result
-    else:
-        return print('No products were saved')
+    print('\nNote: Do not use spaces or accents unless necessary.') #como hay productos que puede que tengan espacios en la mitad por eso pongo esto y no un punto replace(" ","")
+    name = input('Enter the product name: ').strip().lower() #Quitar los espacios de los extremos y poner en minuscula todo
 
     # Verificar si ya esta agregado o no, esto devuelve un boolean
     added = any(product['name'] == name for product in inventory)
     if added:
-        return print('This product has already been added!')
+        return print(f"{'-' * 10} Error! This product has already been added! {'-' * 10}")
     else:
+        result = get_product_data() #Pedir los otros dos datos
+        #Si no es none es porque si guardo algo
+        if result is not None:
+            price, quantity = result 
+            while price < 0 or quantity < 0:
+                print(f"{'-' * 10} Error! you can't added products negative! {'-' * 10}")
+                result = get_product_data() #Pedir los otros dos datos
+                if result is None:
+                    return print('No products were saved')
+
+        else:
+            return print('No products were saved')
+
         #Esquema del diccionario producto
         product = {
             'name': name,
@@ -89,22 +95,32 @@ def search_product (inventory): #3 ---
     for product in inventory:
         if product['name'] == name:
             return print(f'Product found!\n {product}')
-        else:
-            return print(f" {'-' * 10} Error 404!\nProduct not found! {'-' * 10}")
+    
+    return print(f" {'-' * 10} Error 404!\nProduct not found! {'-' * 10}")
 
 def update_product(inventory): #4 ---
     name = input('\nEnter the product name to update: ').strip().lower()
-    option = int(input('\nDo you like chage everything or not?\n1.YES!\n2.NO!'))
-    while option > 0 and option < 3:
-        #Recorer para encontrarlo y update
-        for product in inventory:
-            if product['name'] == name: #Si lo encuentra update
-
+    #Recorer para encontrarlo y update
+    for product in inventory:
+        if product['name'] == name: #Si lo encuentra update
+            option = int(input('\nDo you like chage everything or not?\n1.YES!\n2.NO!'))
+            
+            while option > 0 and option < 3:
+                
                 if option == 1: #si quiere cambiar todo
                     #pedir los 3 datos y update
+                    name = input('Enter the product name: ').strip().lower()
                     result = get_product_data()
                     if result is not None: #Osea si guardo los datos
-                        name, price, quantity = result
+                        price, quantity = result
+                        
+                        while price < 0 or quantity < 0:
+                            print(f"{'-' * 10} Error! you can't added products negative! {'-' * 10}")
+                            result = get_product_data() #Pedir los otros dos datos
+                            if result is None:
+                                return print('No products were saved')
+
+
                         product['name'], product['price'], product['quantity'] = name, price, quantity
                         return print(f"\nProduct '{name}' update to inventory with price {price} and quantity {quantity}.")
                     else:
@@ -114,19 +130,27 @@ def update_product(inventory): #4 ---
                     option = options_(4,1)
                     #reemplazar los datos
                     if option == 1:
-                        product['name'] == input('Enter the product name to update:')
-                        return print(f"Product '{name}' updated to inventory  ")
+                        product['name'] = input('Enter the product name to update:')
+                        return print(f"Product '{product['name']}' updated to inventory  ")
                     elif option == 2:
-                        product['price'] == float(input('Enter the product price to update:'))
-                        return print(f"Product '{name}' updated to inventory with price {price} ")
+                        product['price'] = float(input('Enter the product price to update:'))
+                        # Por si pone valores negativos
+                        if product['price'] < 0 :
+                            print(f"{'-' * 10} Error! you can't added products negative! {'-' * 10}")
+                            product['price'] = float(input('Enter the product price to update:'))
+                        return print(f"Product '{product['name']}' updated to inventory with price {product['price']} ")
                     elif option == 3:
-                        product['quantity'] == int(input('Enter the product quantity to update:'))
-                        return print(f"Product '{name}' updated to inventory with quantity {quantity} ")
+                        product['quantity'] = int(input('Enter the product quantity to update:'))
+                        if product['quantity'] < 0 :
+                            print(f"{'-' * 10} Error! you can't added products negative! {'-' * 10}")
+                            product['quantity'] = float(input('Enter the product quantity to update:'))
+                        return print(f"Product '{product['name']}' updated to inventory with quantity {product['quantity']} ")
                     else:
                         return print(f"{'-' * 10} No products have been updated! {'-' * 10}")
-            #dato no encontrado
-            else:
-                return print(f"{'-' * 10} Product no found to update! {'-' * 10}")
+                
+    
+    #dato no encontrado
+    return print(f"{'-' * 10} Product no found to update! {'-' * 10}")
 
 
 
@@ -137,8 +161,8 @@ def delete_product(inventory): #5 ---
             inventory.remove(product)
             return print(f"Product! '{name}' deleted  ")
             
-        else:
-            return print(f"{'-' * 10} Error 404!  Product not found! {'-' * 10}")
+    else:
+        return print(f"{'-' * 10} Error 404!  Product not found! {'-' * 10}")
 
 def calculate_statistics(inventory): #6 ---
     total_cost,total_quantity, expensive_product, larger_inventory,expensive, larger = 0, 0, "", "", 0.0, 0

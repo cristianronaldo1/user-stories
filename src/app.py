@@ -1,4 +1,5 @@
 from services import add_product,show_product,calculate_statistics,search_product,update_product,delete_product
+from files import save_csv,upload_csv
 
 inventory = []
 
@@ -34,11 +35,11 @@ def choice():
             elif option == 6:
                 calculate_statistics(inventory) #LISTOOO
             elif option == 7:
-                pass
+                save_csv(inventory, route='data/inventory.csv', include_header=True)
             elif option == 8:
-                pass
-            elif option == 9:
-                print('\nThanks for used our services')
+                upload_csv()
+            elif option == 9: #listo
+                return print('\nThanks for used our services')
             else:
                 print(f"\n{'-' * 10} Invalid input {'-' * 10}")
                 choice()
